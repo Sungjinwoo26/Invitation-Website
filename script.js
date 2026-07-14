@@ -3,7 +3,6 @@ const videoOverlay = document.getElementById('videoOverlay');
 const entryVideo = document.getElementById('entryVideo');
 const stageThree = document.getElementById('stageThree');
 const countdownTimer = document.getElementById('countdownTimer');
-const pageNav = document.getElementById('pageNav');
 let opened = false;
 let countdownInterval = null;
 
@@ -116,7 +115,9 @@ function playBackgroundAmbience() {
 }
 
 function setCountdown() {
-  const target = new Date('2026-08-30T10:30:00');
+  if (!countdownTimer) return;
+
+  const target = new Date('2026-08-30T12:15:00+05:30');
 
   function updateCountdown() {
     const now = new Date();
@@ -151,26 +152,33 @@ function setCountdown() {
 
 function revealStageThree() {
   stageThree.classList.remove('hidden');
+  const coverScene = document.getElementById('coverScene');
+  if (coverScene) {
+    coverScene.style.display = 'none';
+  }
   document.body.style.overflowX = 'hidden';
+  document.body.style.overflowY = 'auto';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   playBackgroundAmbience();
 
   if (window.gsap) {
     gsap.from(stageThree, { opacity: 0, duration: 1.2, ease: 'power3.out' });
-    gsap.from('.hero-content h1, .hero-subtitle, .hero-tagline, .hero-date, .countdown-card, .scroll-hint', {
+    gsap.from('.page-content h2, .page-content p, .countdown-shell', {
       opacity: 0,
-      y: 40,
-      stagger: 0.1,
+      y: 36,
+      stagger: 0.15,
       duration: 1,
       ease: 'power3.out',
       delay: 0.2,
     });
-    gsap.from('.timeline-card', { opacity: 0, y: 34, stagger: 0.1, duration: 0.85, ease: 'power3.out', delay: 0.7 });
   }
 }
 
 function showEntryVideo() {
   videoOverlay.classList.add('active');
+  videoOverlay.setAttribute('aria-hidden', 'false');
   entryVideo.currentTime = 0;
+  entryVideo.muted = true;
   const playPromise = entryVideo.play();
 
   if (playPromise !== undefined) {
@@ -184,7 +192,9 @@ function showEntryVideo() {
 
 function hideEntryVideo() {
   videoOverlay.classList.remove('active');
+  videoOverlay.setAttribute('aria-hidden', 'true');
   entryVideo.pause();
+  entryVideo.currentTime = 0;
 }
 
 entryVideo.addEventListener('error', () => {
@@ -200,12 +210,42 @@ entryVideo.addEventListener('ended', () => {
   setCountdown();
 });
 
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 120) {
-    pageNav.classList.add('visible');
-  } else {
-    pageNav.classList.remove('visible');
+entryVideo.addEventListener('play', () => {
+  videoOverlay.setAttribute('aria-hidden', 'false');
+});
+
+entryVideo.addEventListener('pause', () => {
+  videoOverlay.setAttribute('aria-hidden', 'true');
+});
+
+// Double-tap to skip video
+let lastTap = 0;
+videoOverlay.addEventListener('touchend', (e) => {
+  const currentTime = new Date().getTime();
+  const tapLength = currentTime - lastTap;
+  if (tapLength < 300 && tapLength > 0) {
+    // Double tap detected
+    hideEntryVideo();
+    revealStageThree();
+    setCountdown();
   }
+  lastTap = currentTime;
+});
+
+// Also support double-click on desktop
+let clickCount = 0;
+let clickTimeout;
+videoOverlay.addEventListener('click', () => {
+  clickCount++;
+  if (clickCount === 2) {
+    hideEntryVideo();
+    revealStageThree();
+    setCountdown();
+    clickCount = 0;
+  }
+  clickTimeout = setTimeout(() => {
+    clickCount = 0;
+  }, 300);
 });
 
 initInvitationFlow();

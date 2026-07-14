@@ -16,13 +16,16 @@
 
 html, body {
   margin: 0;
+  padding: 0;
   min-height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   background: radial-gradient(circle at top, rgba(255, 235, 190, 0.14), transparent 24%),
               radial-gradient(circle at 20% 20%, rgba(255, 240, 200, 0.15), transparent 16%),
               linear-gradient(180deg, #2d1c0f 0%, #1b130c 30%, #100a06 100%);
   color: var(--text-primary);
   font-family: 'Poppins', sans-serif;
-  overflow-x: hidden;
 }
 
 body::before {
@@ -34,12 +37,24 @@ body::before {
   pointer-events: none;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 0;
+}
+
+body {
+  scroll-behavior: smooth;
+  overflow-x: hidden !important;
+}
+
 .scene {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 2rem;
+  padding: 1rem;
   position: relative;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .cover-card {
@@ -544,7 +559,8 @@ body::before {
   position: relative;
   min-height: 100vh;
   background: linear-gradient(180deg, #faf3e7 0%, #f5ede1 40%, #ead8bb 100%);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   color: #3f2d1e;
 }
 
@@ -555,6 +571,280 @@ body::before {
   background-image: radial-gradient(circle at 20% 20%, rgba(255, 238, 210, 0.35), transparent 28%),
                     radial-gradient(circle at 85% 10%, rgba(255, 244, 217, 0.22), transparent 30%);
   pointer-events: none;
+}
+
+.home-flow {
+  scroll-snap-type: y mandatory;
+  overflow-y: auto;
+  height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.page-screen {
+  position: relative;
+  width: 100%;
+  height: auto;
+  display: grid;
+  place-items: center;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  padding: 0;
+  overflow: hidden;
+  aspect-ratio: 9 / 16;
+}
+
+.page-screen img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.page-veil {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.page-content {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  width: min(100%, 720px);
+  padding: 2.4rem 2rem;
+  border-radius: 32px;
+  text-align: center;
+  color: #fffdf8;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  display: none;
+}
+
+.page-content--compact {
+  max-width: 620px;
+}
+
+.page-kicker {
+  margin: 0 0 0.7rem;
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  color: rgba(255, 241, 220, 0.9);
+}
+
+.page-content h2 {
+  margin: 0;
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(2.4rem, 4.8vw, 3.4rem);
+  line-height: 1.05;
+}
+
+.page-copy {
+  margin: 1rem auto 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.8;
+  max-width: 540px;
+  color: rgba(255, 247, 236, 0.92);
+}
+
+.countdown-screen {
+  background: linear-gradient(135deg, rgba(246, 235, 218, 0.98), rgba(233, 219, 192, 0.96));
+  padding: 0;
+  aspect-ratio: auto;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.countdown-shell {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  padding: 0.8rem 1rem;
+  border-radius: 0;
+  text-align: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.countdown-label {
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(86, 54, 25, 0.85);
+  line-height: 1;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .countdown-label {
+    display: block;
+    font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+
+.countdown-shell h3 {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.9rem;
+  color: #573b20;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .countdown-shell h3 {
+    font-size: clamp(1.4rem, 2.8vw, 2rem);
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
+.countdown-date {
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.65rem;
+  color: rgba(82, 54, 24, 0.88);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .countdown-date {
+    display: block;
+    font-size: clamp(0.9rem, 1.6vw, 1.2rem);
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: start;
+  }
+}
+
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+  margin-top: 0;
+  width: auto;
+  max-width: none;
+  padding: 0;
+  align-content: center;
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  .countdown-grid {
+    gap: 1rem;
+    grid-column: 2;
+    grid-row: 2 / 4;
+    width: 100%;
+    flex: none;
+  }
+}
+
+.countdown-card {
+  padding: 0.4rem 0.3rem;
+  border-radius: 6px;
+  background: rgba(255, 249, 240, 0.9);
+  border: 1px solid rgba(190, 149, 94, 0.1);
+  box-shadow: 0 2px 4px rgba(28, 16, 5, 0.04);
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .countdown-card {
+    padding: 1rem 0.8rem;
+    border-radius: 12px;
+    background: rgba(255, 249, 240, 0.95);
+    border: 1px solid rgba(190, 149, 94, 0.15);
+    box-shadow: 0 4px 12px rgba(28, 16, 5, 0.06);
+  }
+}
+
+.count-value {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.8rem;
+  color: #6d4722;
+  line-height: 1;
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .count-value {
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+  }
+}
+
+.countdown-card span:last-child {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.4rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(92, 61, 32, 0.85);
+  line-height: 1;
+  font-weight: 600;
+}
+
+@media (min-width: 768px) {
+  .countdown-card span:last-child {
+    margin-top: 0.4rem;
+    font-size: clamp(0.7rem, 1.2vw, 1rem);
+    letter-spacing: 0.15em;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-content {
+    padding: 1.6rem 1.2rem;
+    border-radius: 0;
+  }
+
+  .page-content h2 {
+    font-size: clamp(2rem, 8vw, 2.7rem);
+  }
+
+  .countdown-grid {
+    grid-template-columns: repeat(4, minmax(50px, 1fr));
+  }
+
+  .countdown-shell {
+    padding: 0.8rem 0.8rem;
+    width: min(95vw, 480px);
+  }
 }
 
 .page-nav {
