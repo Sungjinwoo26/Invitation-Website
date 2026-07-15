@@ -94,34 +94,6 @@ body.stage-active {
   object-fit: cover;
 }
 
-.video-skip-hint {
-  position: absolute;
-  left: 50%;
-  bottom: max(2.4rem, env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  margin: 0;
-  padding: 0.5rem 1.1rem;
-  border: 1px solid rgba(245, 239, 224, 0.35);
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.32);
-  color: rgba(245, 239, 224, 0.85);
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.78rem;
-  font-weight: 300;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  opacity: 0;
-  animation: video-hint-fade 1s ease forwards;
-  animation-delay: 1s;
-  pointer-events: none;
-}
-
-@keyframes video-hint-fade {
-  to {
-    opacity: 1;
-  }
-}
-
 /* ---------- Invitation flow (post-video) ---------- */
 
 .stage-three.hidden {

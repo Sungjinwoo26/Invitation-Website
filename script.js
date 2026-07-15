@@ -2,6 +2,7 @@ const coverScreen = document.getElementById('coverScreen');
 const videoScreen = document.getElementById('videoScreen');
 const entryVideo = document.getElementById('entryVideo');
 const stageThree = document.getElementById('stageThree');
+const homeFlow = document.getElementById('homeFlow');
 const countdownTimer = document.getElementById('countdownTimer');
 
 let opened = false;
@@ -70,6 +71,30 @@ function celebrateWithConfetti() {
   }, 200);
 }
 
+let pictureConfettiInitialized = false;
+function initPictureConfetti() {
+  if (pictureConfettiInitialized) return;
+  pictureConfettiInitialized = true;
+
+  const pictureSections = ['pageOne', 'pageTwo', 'pageThree']
+    .map((id) => document.getElementById(id))
+    .filter(Boolean);
+
+  if (!pictureSections.length || typeof IntersectionObserver !== 'function' || !homeFlow) return;
+
+  const fired = new Set();
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting && !fired.has(entry.target.id)) {
+        fired.add(entry.target.id);
+        celebrateWithConfetti();
+      }
+    });
+  }, { root: homeFlow, threshold: 0.6 });
+
+  pictureSections.forEach((section) => observer.observe(section));
+}
+
 function setCountdown() {
   if (!countdownTimer) return;
 
@@ -115,7 +140,7 @@ function revealStageThree() {
     gsap.from(stageThree, { opacity: 0, duration: 1.2, ease: 'power3.out' });
   }
 
-  celebrateWithConfetti();
+  initPictureConfetti();
 }
 
 coverScreen.addEventListener('click', openInvitation);
