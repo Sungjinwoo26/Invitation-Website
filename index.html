@@ -2,95 +2,98 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Akanksha ♥ Sanket | Wedding Invitation</title>
+  <link rel="preload" as="image" href="Content/cover.png" />
+  <link rel="preload" as="video" href="Content/Entry%20Video.mp4" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@400;600;700&family=Great+Vibes&family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Great+Vibes&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
 </head>
 <body>
-  <div class="scene" id="coverScene">
-    <div class="ambient-glow"></div>
-    <div class="background-lights"></div>
-    <div class="petal-layer" aria-hidden="true"></div>
-
-    <div class="cover-card" id="coverCard" role="button" aria-label="Tap to begin invitation" tabindex="0">
-      <div class="cover-card-inner">
-        <div class="cover-ribbon"></div>
-        <div class="cover-content-single">
-          <div class="lotus-icon" aria-hidden="true">
-            <div class="petal petal-1"></div>
-            <div class="petal petal-2"></div>
-            <div class="petal petal-3"></div>
-            <div class="petal petal-4"></div>
-            <div class="petal petal-5"></div>
-          </div>
-          <p class="cover-name">Akanksha</p>
-          <p class="cover-heart">♡</p>
-          <p class="cover-weds">Weds</p>
-          <p class="cover-heart">♡</p>
-          <p class="cover-name">Sanket</p>
-          <p class="cover-date">30 August 2026</p>
-          <div class="tap-area">
-            <span>Tap Anywhere to Begin</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="video-overlay" id="videoOverlay" aria-hidden="true">
-      <video id="entryVideo" playsinline preload="auto" muted src="content/Entry Video.mp4"></video>
-    </div>
+  <div class="cover-screen" id="coverScreen" role="button" tabindex="0" aria-label="Tap to open the invitation">
+    <img class="cover-image" id="coverImage" src="Content/cover.png" alt="Wedding invitation cover" />
   </div>
 
-    <section class="stage-three hidden" id="stageThree">
-      <div class="home-flow" id="homeFlow">
-        <section class="page-screen page-screen--one" id="pageOne">
-          <img src="content/page1.png" alt="Wedding invitation page one" />
-          <div class="page-veil"></div>
-          <div class="page-content">
-            <p class="page-kicker">With love, joy, and blessings</p>
-            <h2>Akanksha &amp; Sanket</h2>
-            <p class="page-copy">We invite you to celebrate our wedding ceremony on 30 August 2026.</p>
-          </div>
-        </section>
+  <div class="video-screen" id="videoScreen" aria-hidden="true">
+    <video id="entryVideo" class="entry-video" playsinline preload="auto" src="Content/Entry Video.mp4"></video>
+    <p class="video-skip-hint">Double-tap to skip</p>
+  </div>
 
-        <section class="page-screen countdown-screen" id="countdownSection">
-          <div class="countdown-shell">
-            <h2 class="countdown-coming-soon">COMING SOON ....</h2>
-            <div class="countdown-grid" id="countdownTimer">
-              <div class="countdown-card"><span class="count-value">00</span><span class="count-label">Days</span></div>
-              <div class="countdown-card"><span class="count-value">00</span><span class="count-label">Hours</span></div>
-              <div class="countdown-card"><span class="count-value">00</span><span class="count-label">Minutes</span></div>
-              <div class="countdown-card"><span class="count-value">00</span><span class="count-label">Seconds</span></div>
-            </div>
-          </div>
-        </section>
+  <section class="stage-three hidden" id="stageThree">
+    <div class="home-flow" id="homeFlow">
+      <section class="page-screen page-screen--one" id="pageOne">
+        <img src="Content/page1.png" alt="Wedding invitation page one" />
+        <div class="page-veil"></div>
+        <div class="page-content">
+          <p class="page-kicker">With love, joy, and blessings</p>
+          <h2>Akanksha &amp; Sanket</h2>
+          <p class="page-copy">We invite you to celebrate our wedding ceremony on 30 August 2026.</p>
+        </div>
+      </section>
 
-        <section class="page-screen page-screen--two" id="pageTwo">
-          <img src="content/page2.png" alt="Wedding invitation page two" />
-          <div class="page-veil"></div>
-          <div class="page-content">
-            <p class="page-kicker">Join us in celebration</p>
-            <h2>The ceremony</h2>
-            <p class="page-copy">A heartfelt evening of vows, traditions, and togetherness.</p>
+      <section class="page-screen countdown-screen" id="countdownSection">
+        <div class="countdown-shell">
+          <h2 class="countdown-coming-soon">COMING SOON ....</h2>
+          <div class="countdown-grid" id="countdownTimer">
+            <div class="countdown-card"><span class="count-value">00</span><span class="count-label">Days</span></div>
+            <div class="countdown-card"><span class="count-value">00</span><span class="count-label">Hours</span></div>
+            <div class="countdown-card"><span class="count-value">00</span><span class="count-label">Minutes</span></div>
+            <div class="countdown-card"><span class="count-value">00</span><span class="count-label">Seconds</span></div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section class="page-screen page-screen--three" id="pageThree">
-          <img src="content/page3.png" alt="Wedding invitation page three" />
-          <div class="page-veil"></div>
-          <div class="page-content page-content--compact">
-            <p class="page-kicker">With gratitude</p>
-            <h2>We look forward to welcoming you</h2>
-            <p class="page-copy">Celebrate this beautiful beginning with us.</p>
+      <section class="page-screen page-screen--two" id="pageTwo">
+        <img src="Content/page2.png" alt="Wedding invitation page two" />
+        <div class="page-veil"></div>
+        <div class="page-content">
+          <p class="page-kicker">Join us in celebration</p>
+          <h2>The ceremony</h2>
+          <p class="page-copy">A heartfelt evening of vows, traditions, and togetherness.</p>
+        </div>
+      </section>
+
+      <section class="page-screen page-screen--three" id="pageThree">
+        <img src="Content/page3.png" alt="Wedding invitation page three" />
+        <div class="page-veil"></div>
+        <div class="page-content page-content--compact">
+          <p class="page-kicker">With gratitude</p>
+          <h2>We look forward to welcoming you</h2>
+          <p class="page-copy">Celebrate this beautiful beginning with us.</p>
+        </div>
+      </section>
+
+      <section class="page-screen venue-screen" id="venueSection">
+        <div class="venue-shell">
+          <p class="venue-kicker">Venue</p>
+          <h2 class="venue-name">Tip Top International</h2>
+          <p class="venue-address">Wakad, Mumbai–Pune Expressway, Hinjawadi, Pune, Maharashtra 411057</p>
+          <div class="venue-map-wrap">
+            <iframe
+              class="venue-map-frame"
+              src="https://www.google.com/maps?q=Hotel+Tip+Top+International,+Wakad+Mumbai-Pune+Expressway,+Hinjawadi,+Pune,+Maharashtra+411057&output=embed"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Map showing Tip Top International, Pune"
+              tabindex="-1"
+              aria-hidden="true"
+            ></iframe>
+            <a
+              class="venue-map-link"
+              href="https://maps.app.goo.gl/hBcutc7ec1byYA9z6"
+              aria-label="Open Tip Top International in Google Maps"
+            ></a>
           </div>
-        </section>
-      </div>
-    </section>
+          <p class="venue-map-hint">Tap the map to open directions</p>
+        </div>
+      </section>
+    </div>
+  </section>
 
   <script src="script.js"></script>
 </body>

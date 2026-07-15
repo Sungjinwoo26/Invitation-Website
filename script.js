@@ -1,117 +1,73 @@
-const coverCard = document.getElementById('coverCard');
-const videoOverlay = document.getElementById('videoOverlay');
+const coverScreen = document.getElementById('coverScreen');
+const videoScreen = document.getElementById('videoScreen');
 const entryVideo = document.getElementById('entryVideo');
 const stageThree = document.getElementById('stageThree');
 const countdownTimer = document.getElementById('countdownTimer');
+
 let opened = false;
 let countdownInterval = null;
 
-function initInvitationFlow() {
-  if (!coverCard || !videoOverlay || !entryVideo || !stageThree) {
-    return;
+function openInvitation(event) {
+  if (opened) return;
+  opened = true;
+
+  event?.preventDefault?.();
+
+  coverScreen.classList.add('fade-out');
+  videoScreen.classList.add('active');
+  videoScreen.setAttribute('aria-hidden', 'false');
+
+  entryVideo.currentTime = 0;
+  entryVideo.muted = false;
+  const playPromise = entryVideo.play();
+
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      entryVideo.muted = true;
+      entryVideo.play().catch(() => {
+        finishInvitationVideo();
+      });
+    });
   }
 
-  function openInvitation(event) {
-    if (opened) return;
-    if (event && event.type === 'pointerdown' && event.pointerType === 'mouse' && event.button !== 0) return;
-    if (event && event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
-
-    event?.preventDefault?.();
-    opened = true;
-    coverCard.classList.add('faded');
-    playAmbientBell();
-
-    setTimeout(() => {
-      showEntryVideo();
-    }, 700);
-  }
-
-  const startFromCard = (event) => {
-    if (event.target && coverCard.contains(event.target)) {
-      openInvitation(event);
-    }
-  };
-
-  coverCard.addEventListener('click', openInvitation, { passive: false });
-  coverCard.addEventListener('pointerup', startFromCard, { passive: false });
-  coverCard.addEventListener('touchend', startFromCard, { passive: false });
-  coverCard.addEventListener('keydown', openInvitation);
-
-  document.addEventListener('keydown', (event) => {
-    const tag = event.target && event.target.tagName;
-    if (opened) return;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || (event.target && event.target.isContentEditable)) return;
-    if (event.key === 'Enter' || event.key === ' ') {
-      openInvitation(event);
-    }
-  });
-
-  window.addEventListener('load', () => {
-    try {
-      coverCard.setAttribute('tabindex', '0');
-      coverCard.focus({ preventScroll: true });
-    } catch (error) {
-      console.warn('Unable to auto-focus cover card', error);
-    }
-  });
+  coverScreen.addEventListener('transitionend', () => {
+    coverScreen.classList.add('hidden');
+  }, { once: true });
 }
 
-function playAmbientBell() {
-  try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(520, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.05, audioCtx.currentTime + 0.1);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.2);
-    osc.connect(gain).connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 2.3);
-  } catch (error) {
-    console.warn('Audio not available', error);
+function finishInvitationVideo() {
+  videoScreen.classList.remove('active');
+  videoScreen.setAttribute('aria-hidden', 'true');
+  entryVideo.pause();
+  revealStageThree();
+  setCountdown();
+}
+
+let lastVideoTap = 0;
+function skipVideoOnDoubleTap(event) {
+  if (entryVideo.paused) return;
+  const now = Date.now();
+  if (now - lastVideoTap < 400) {
+    event.preventDefault();
+    finishInvitationVideo();
+    lastVideoTap = 0;
+  } else {
+    lastVideoTap = now;
   }
 }
 
-function playBackgroundAmbience() {
-  try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const gain = audioCtx.createGain();
-    const osc1 = audioCtx.createOscillator();
-    const osc2 = audioCtx.createOscillator();
-    const lfo = audioCtx.createOscillator();
-    const lfoGain = audioCtx.createGain();
+videoScreen.addEventListener('click', skipVideoOnDoubleTap);
 
-    osc1.type = 'sine';
-    osc1.frequency.value = 140;
-    osc2.type = 'triangle';
-    osc2.frequency.value = 210;
-    lfo.type = 'sine';
-    lfo.frequency.value = 0.08;
+function celebrateWithConfetti() {
+  if (typeof confetti !== 'function') return;
+  const colors = ['#c79d4b', '#f5efe0', '#7a2e2e', '#e8c874'];
 
-    lfoGain.gain.value = 0.04;
-    lfo.connect(lfoGain);
-    lfoGain.connect(gain.gain);
+  confetti({ particleCount: 70, spread: 65, startVelocity: 38, origin: { x: 0.12, y: 0.75 }, colors, scalar: 0.9, ticks: 220 });
+  confetti({ particleCount: 70, spread: 65, startVelocity: 38, origin: { x: 0.88, y: 0.75 }, colors, scalar: 0.9, ticks: 220 });
 
-    gain.gain.value = 0.008;
-    osc1.connect(gain);
-    osc2.connect(gain);
-    gain.connect(audioCtx.destination);
-
-    osc1.start();
-    osc2.start();
-    lfo.start();
-
-    window.addEventListener('pagehide', () => {
-      osc1.stop();
-      osc2.stop();
-      lfo.stop();
-      audioCtx.close();
-    }, { once: true });
-  } catch (error) {
-    console.warn('Background ambience unavailable', error);
-  }
+  setTimeout(() => {
+    confetti({ particleCount: 90, spread: 100, startVelocity: 42, origin: { x: 0.5, y: 0.35 }, colors, scalar: 1, ticks: 240 });
+  }, 200);
 }
 
 function setCountdown() {
@@ -125,10 +81,10 @@ function setCountdown() {
     if (diff <= 0) {
       clearInterval(countdownInterval);
       countdownTimer.innerHTML = `
-        <div class="countdown-card"><span class="count-value">00</span><span>Days</span></div>
-        <div class="countdown-card"><span class="count-value">00</span><span>Hours</span></div>
-        <div class="countdown-card"><span class="count-value">00</span><span>Minutes</span></div>
-        <div class="countdown-card"><span class="count-value">00</span><span>Seconds</span></div>
+        <div class="countdown-card"><span class="count-value">00</span><span class="count-label">Days</span></div>
+        <div class="countdown-card"><span class="count-value">00</span><span class="count-label">Hours</span></div>
+        <div class="countdown-card"><span class="count-value">00</span><span class="count-label">Minutes</span></div>
+        <div class="countdown-card"><span class="count-value">00</span><span class="count-label">Seconds</span></div>
       `;
       return;
     }
@@ -139,10 +95,10 @@ function setCountdown() {
     const seconds = Math.floor((diff / 1000) % 60);
 
     countdownTimer.innerHTML = `
-      <div class="countdown-card"><span class="count-value">${String(days).padStart(2, '0')}</span><span>Days</span></div>
-      <div class="countdown-card"><span class="count-value">${String(hours).padStart(2, '0')}</span><span>Hours</span></div>
-      <div class="countdown-card"><span class="count-value">${String(minutes).padStart(2, '0')}</span><span>Minutes</span></div>
-      <div class="countdown-card"><span class="count-value">${String(seconds).padStart(2, '0')}</span><span>Seconds</span></div>
+      <div class="countdown-card"><span class="count-value">${String(days).padStart(2, '0')}</span><span class="count-label">Days</span></div>
+      <div class="countdown-card"><span class="count-value">${String(hours).padStart(2, '0')}</span><span class="count-label">Hours</span></div>
+      <div class="countdown-card"><span class="count-value">${String(minutes).padStart(2, '0')}</span><span class="count-label">Minutes</span></div>
+      <div class="countdown-card"><span class="count-value">${String(seconds).padStart(2, '0')}</span><span class="count-label">Seconds</span></div>
     `;
   }
 
@@ -152,100 +108,20 @@ function setCountdown() {
 
 function revealStageThree() {
   stageThree.classList.remove('hidden');
-  const coverScene = document.getElementById('coverScene');
-  if (coverScene) {
-    coverScene.style.display = 'none';
-  }
-  document.body.style.overflowX = 'hidden';
-  document.body.style.overflowY = 'auto';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  playBackgroundAmbience();
+  document.body.classList.add('stage-active');
+  window.scrollTo({ top: 0, behavior: 'auto' });
 
   if (window.gsap) {
     gsap.from(stageThree, { opacity: 0, duration: 1.2, ease: 'power3.out' });
-    gsap.from('.page-content h2, .page-content p, .countdown-shell', {
-      opacity: 0,
-      y: 36,
-      stagger: 0.15,
-      duration: 1,
-      ease: 'power3.out',
-      delay: 0.2,
-    });
   }
+
+  celebrateWithConfetti();
 }
 
-function showEntryVideo() {
-  videoOverlay.classList.add('active');
-  videoOverlay.setAttribute('aria-hidden', 'false');
-  entryVideo.currentTime = 0;
-  entryVideo.muted = true;
-  const playPromise = entryVideo.play();
-
-  if (playPromise !== undefined) {
-    playPromise.catch(error => {
-      console.warn('Video playback blocked:', error);
-      revealStageThree();
-      setCountdown();
-    });
-  }
-}
-
-function hideEntryVideo() {
-  videoOverlay.classList.remove('active');
-  videoOverlay.setAttribute('aria-hidden', 'true');
-  entryVideo.pause();
-  entryVideo.currentTime = 0;
-}
-
-entryVideo.addEventListener('error', () => {
-  console.warn('Video failed to load. Showing wedding website instead.');
-  hideEntryVideo();
-  revealStageThree();
-  setCountdown();
+coverScreen.addEventListener('click', openInvitation);
+coverScreen.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' || event.key === ' ') openInvitation(event);
 });
 
-entryVideo.addEventListener('ended', () => {
-  hideEntryVideo();
-  revealStageThree();
-  setCountdown();
-});
-
-entryVideo.addEventListener('play', () => {
-  videoOverlay.setAttribute('aria-hidden', 'false');
-});
-
-entryVideo.addEventListener('pause', () => {
-  videoOverlay.setAttribute('aria-hidden', 'true');
-});
-
-// Double-tap to skip video
-let lastTap = 0;
-videoOverlay.addEventListener('touchend', (e) => {
-  const currentTime = new Date().getTime();
-  const tapLength = currentTime - lastTap;
-  if (tapLength < 300 && tapLength > 0) {
-    // Double tap detected
-    hideEntryVideo();
-    revealStageThree();
-    setCountdown();
-  }
-  lastTap = currentTime;
-});
-
-// Also support double-click on desktop
-let clickCount = 0;
-let clickTimeout;
-videoOverlay.addEventListener('click', () => {
-  clickCount++;
-  if (clickCount === 2) {
-    hideEntryVideo();
-    revealStageThree();
-    setCountdown();
-    clickCount = 0;
-  }
-  clickTimeout = setTimeout(() => {
-    clickCount = 0;
-  }, 300);
-});
-
-initInvitationFlow();
+entryVideo.addEventListener('ended', finishInvitationVideo);
+entryVideo.addEventListener('error', finishInvitationVideo);
