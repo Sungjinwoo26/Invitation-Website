@@ -210,7 +210,7 @@ function initScratchCard() {
       total++;
       if (data[i] < 40) cleared++;
     }
-    if (total && cleared / total > 0.55) {
+    if (total && cleared / total >= 0.6) {
       finishReveal();
     }
   }
