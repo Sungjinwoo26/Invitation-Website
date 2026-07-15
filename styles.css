@@ -42,11 +42,15 @@ body.stage-active {
   cursor: pointer;
   touch-action: none;
   -webkit-tap-highlight-color: transparent;
-  transition: opacity 0.6s ease;
+  transition: opacity 1.1s cubic-bezier(0.45, 0, 0.2, 1),
+              transform 1.1s cubic-bezier(0.45, 0, 0.2, 1),
+              filter 1.1s cubic-bezier(0.45, 0, 0.2, 1);
 }
 
 .cover-screen.fade-out {
   opacity: 0;
+  transform: scale(1.06);
+  filter: brightness(1.15) blur(2px);
   pointer-events: none;
 }
 
@@ -78,7 +82,8 @@ body.stage-active {
   opacity: 0;
   visibility: hidden;
   touch-action: none;
-  transition: opacity 0.6s ease, visibility 0.6s ease;
+  transition: opacity 1.2s cubic-bezier(0.45, 0, 0.2, 1) 0.35s,
+              visibility 1.2s ease 0.35s;
 }
 
 .video-screen.active {
@@ -188,6 +193,12 @@ body.stage-active {
   font-weight: 600;
 }
 
+.scratch-wrap {
+  position: relative;
+  width: 100%;
+  isolation: isolate;
+}
+
 .countdown-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -197,6 +208,24 @@ body.stage-active {
   padding: 0 0.8rem;
   align-content: center;
   justify-items: stretch;
+}
+
+.scratch-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  cursor: pointer;
+  touch-action: none;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+.scratch-canvas--cleared {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .countdown-card {

@@ -131,6 +131,143 @@ function setCountdown() {
   countdownInterval = setInterval(updateCountdown, 1000);
 }
 
+function initScratchCard() {
+  const canvas = document.getElementById('scratchCanvas');
+  const wrap = document.getElementById('scratchWrap');
+  if (!canvas || !wrap) return;
+
+  const ctx = canvas.getContext('2d');
+  let revealed = false;
+  let scratching = false;
+  let lastPoint = null;
+  let moveCount = 0;
+
+  function paintOverlay(width, height) {
+    ctx.globalCompositeOperation = 'source-over';
+    const gradient = ctx.createLinearGradient(0, 0, width, height);
+    gradient.addColorStop(0, '#eecf86');
+    gradient.addColorStop(0.5, '#c79d4b');
+    gradient.addColorStop(1, '#a97c33');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+    ctx.lineWidth = 6;
+    for (let x = -height; x < width; x += 16) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + height, height);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = 'rgba(61, 37, 16, 0.9)';
+    ctx.font = '600 13px Poppins, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('✦ SCRATCH TO REVEAL ✦', width / 2, height / 2);
+  }
+
+  function sizeCanvas() {
+    const rect = wrap.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    paintOverlay(rect.width, rect.height);
+  }
+
+  function getPoint(event) {
+    const rect = canvas.getBoundingClientRect();
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+  }
+
+  function scratchAt(x, y) {
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 34;
+    ctx.beginPath();
+    if (lastPoint) {
+      ctx.moveTo(lastPoint.x, lastPoint.y);
+      ctx.lineTo(x, y);
+    } else {
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + 0.1, y + 0.1);
+    }
+    ctx.stroke();
+    lastPoint = { x, y };
+  }
+
+  function checkRevealProgress() {
+    if (revealed) return;
+    const w = canvas.width;
+    const h = canvas.height;
+    if (!w || !h) return;
+    const data = ctx.getImageData(0, 0, w, h).data;
+    let cleared = 0;
+    let total = 0;
+    for (let i = 3; i < data.length; i += 24) {
+      total++;
+      if (data[i] < 40) cleared++;
+    }
+    if (total && cleared / total > 0.55) {
+      finishReveal();
+    }
+  }
+
+  function finishReveal() {
+    if (revealed) return;
+    revealed = true;
+    canvas.classList.add('scratch-canvas--cleared');
+    celebrateWithConfetti();
+    setTimeout(() => {
+      canvas.style.display = 'none';
+    }, 500);
+  }
+
+  function handleStart(event) {
+    if (revealed) return;
+    scratching = true;
+    lastPoint = null;
+    try {
+      canvas.setPointerCapture(event.pointerId);
+    } catch (error) {
+      /* pointer capture unsupported, safe to ignore */
+    }
+    const { x, y } = getPoint(event);
+    scratchAt(x, y);
+    checkRevealProgress();
+    event.preventDefault();
+  }
+
+  function handleMove(event) {
+    if (!scratching || revealed) return;
+    const { x, y } = getPoint(event);
+    scratchAt(x, y);
+    moveCount += 1;
+    if (moveCount % 3 === 0) checkRevealProgress();
+    event.preventDefault();
+  }
+
+  function handleEnd() {
+    scratching = false;
+    lastPoint = null;
+    checkRevealProgress();
+  }
+
+  canvas.addEventListener('pointerdown', handleStart);
+  canvas.addEventListener('pointermove', handleMove);
+  canvas.addEventListener('pointerup', handleEnd);
+  canvas.addEventListener('pointercancel', handleEnd);
+  canvas.addEventListener('pointerleave', handleEnd);
+
+  window.addEventListener('resize', () => {
+    if (!revealed) sizeCanvas();
+  });
+
+  sizeCanvas();
+}
+
 function revealStageThree() {
   stageThree.classList.remove('hidden');
   document.body.classList.add('stage-active');
@@ -150,3 +287,5 @@ coverScreen.addEventListener('keydown', (event) => {
 
 entryVideo.addEventListener('ended', finishInvitationVideo);
 entryVideo.addEventListener('error', finishInvitationVideo);
+
+initScratchCard();
