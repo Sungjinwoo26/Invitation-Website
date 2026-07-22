@@ -137,10 +137,12 @@ function initScratchCard() {
   if (!canvas || !wrap) return;
 
   const ctx = canvas.getContext('2d');
+  const MIN_SCRATCH_DISTANCE = 14;
   let revealed = false;
   let scratching = false;
   let lastPoint = null;
   let moveCount = 0;
+  let scratchDistance = 0;
 
   function paintOverlay(width, height) {
     ctx.globalCompositeOperation = 'source-over';
@@ -190,6 +192,7 @@ function initScratchCard() {
     if (lastPoint) {
       ctx.moveTo(lastPoint.x, lastPoint.y);
       ctx.lineTo(x, y);
+      scratchDistance += Math.hypot(x - lastPoint.x, y - lastPoint.y);
     } else {
       ctx.moveTo(x, y);
       ctx.lineTo(x + 0.1, y + 0.1);
@@ -229,6 +232,7 @@ function initScratchCard() {
     if (revealed) return;
     scratching = true;
     lastPoint = null;
+    scratchDistance = 0;
     try {
       canvas.setPointerCapture(event.pointerId);
     } catch (error) {
@@ -250,9 +254,13 @@ function initScratchCard() {
   }
 
   function handleEnd() {
+    if (!revealed && scratching && scratchDistance >= MIN_SCRATCH_DISTANCE) {
+      finishReveal();
+    } else {
+      checkRevealProgress();
+    }
     scratching = false;
     lastPoint = null;
-    checkRevealProgress();
   }
 
   canvas.addEventListener('pointerdown', handleStart);
