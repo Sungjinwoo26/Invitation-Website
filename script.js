@@ -15,8 +15,6 @@ function openInvitation(event) {
   event?.preventDefault?.();
 
   coverScreen.classList.add('fade-out');
-  videoScreen.classList.add('active');
-  videoScreen.setAttribute('aria-hidden', 'false');
 
   entryVideo.currentTime = 0;
   entryVideo.muted = false;
@@ -30,6 +28,14 @@ function openInvitation(event) {
       });
     });
   }
+
+  // Reveal the video only once the cover has nearly finished fading (screen is
+  // already ~black), and as a hard, un-animated switch: animating opacity on a
+  // live decoding <video> is what causes the tearing glitch on some phones.
+  setTimeout(() => {
+    videoScreen.classList.add('active');
+    videoScreen.setAttribute('aria-hidden', 'false');
+  }, 850);
 
   coverScreen.addEventListener('transitionend', () => {
     coverScreen.classList.add('hidden');
@@ -269,9 +275,22 @@ function initScratchCard() {
   canvas.addEventListener('pointercancel', handleEnd);
   canvas.addEventListener('pointerleave', handleEnd);
 
-  window.addEventListener('resize', () => {
-    if (!revealed) sizeCanvas();
-  });
+  if (typeof ResizeObserver === 'function') {
+    const resizeObserver = new ResizeObserver(() => {
+      if (!revealed) sizeCanvas();
+    });
+    resizeObserver.observe(wrap);
+  } else {
+    window.addEventListener('resize', () => {
+      if (!revealed) sizeCanvas();
+    });
+  }
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      if (!revealed) sizeCanvas();
+    });
+  }
 
   sizeCanvas();
 }
