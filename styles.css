@@ -193,20 +193,9 @@ body.stage-active {
   isolation: isolate;
 }
 
-.countdown-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.6rem;
-  width: 100%;
-  max-width: 100%;
-  padding: 0 0.8rem;
-  align-content: center;
-  justify-items: stretch;
-}
-
 .countdown-date {
-  margin: 1.3rem 0.8rem 0;
-  padding: 0.6rem 0.5rem 0;
+  margin: 0 0.8rem 1.3rem;
+  padding: 0 0.5rem 0.6rem;
   font-family: 'Cormorant Garamond', serif;
   font-weight: 700;
   font-size: clamp(1.6rem, 5.2vw, 2.1rem);
@@ -216,6 +205,17 @@ body.stage-active {
   color: var(--gold);
   text-shadow: 0 1px 16px rgba(199, 157, 75, 0.45);
   text-align: center;
+}
+
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 100%;
+  padding: 0 0.8rem;
+  align-content: center;
+  justify-items: stretch;
 }
 
 .scratch-canvas {
