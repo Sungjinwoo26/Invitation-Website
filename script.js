@@ -295,6 +295,49 @@ function initScratchCard() {
   sizeCanvas();
 }
 
+function initVenueMapPreview() {
+  const container = document.getElementById('venueMapPreview');
+  if (!container) return;
+
+  const VENUE_LAT = 18.5955006;
+  const VENUE_LON = 73.7553298;
+  const ZOOM = 16;
+  const GRID_SIZE = 3;
+  const middle = Math.floor(GRID_SIZE / 2);
+
+  const n = 2 ** ZOOM;
+  const xFrac = ((VENUE_LON + 180) / 360) * n;
+  const latRad = (VENUE_LAT * Math.PI) / 180;
+  const yFrac = ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n;
+
+  const xTile = Math.floor(xFrac);
+  const yTile = Math.floor(yFrac);
+
+  const fragment = document.createDocumentFragment();
+  for (let row = 0; row < GRID_SIZE; row += 1) {
+    for (let col = 0; col < GRID_SIZE; col += 1) {
+      const tx = xTile + (col - middle);
+      const ty = yTile + (row - middle);
+      const img = document.createElement('img');
+      img.className = 'venue-map-tile';
+      img.src = `https://tile.openstreetmap.org/${ZOOM}/${tx}/${ty}.png`;
+      img.alt = '';
+      img.loading = 'lazy';
+      img.style.gridColumn = String(col + 1);
+      img.style.gridRow = String(row + 1);
+      fragment.appendChild(img);
+    }
+  }
+  container.appendChild(fragment);
+
+  const pin = document.createElement('span');
+  pin.className = 'venue-map-pin';
+  pin.textContent = '📍';
+  pin.style.left = `${((middle + (xFrac - xTile)) / GRID_SIZE) * 100}%`;
+  pin.style.top = `${((middle + (yFrac - yTile)) / GRID_SIZE) * 100}%`;
+  container.appendChild(pin);
+}
+
 function revealStageThree() {
   stageThree.classList.remove('hidden');
   document.body.classList.add('stage-active');
@@ -316,3 +359,4 @@ entryVideo.addEventListener('ended', finishInvitationVideo);
 entryVideo.addEventListener('error', finishInvitationVideo);
 
 initScratchCard();
+initVenueMapPreview();
