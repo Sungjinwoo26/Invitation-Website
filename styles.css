@@ -212,15 +212,15 @@ body.stage-active {
 
 .countdown-date {
   margin: 1.3rem 0.8rem 0;
-  padding: 0.6rem 0.5rem;
-  font-family: 'Great Vibes', cursive;
-  font-size: clamp(1.9rem, 6vw, 2.5rem);
-  letter-spacing: 0.02em;
+  padding: 0.6rem 0.5rem 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: clamp(1.6rem, 5.2vw, 2.1rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--gold);
   text-shadow: 0 1px 16px rgba(199, 157, 75, 0.45);
   text-align: center;
-  border-top: 1px solid rgba(199, 157, 75, 0.5);
-  border-bottom: 1px solid rgba(199, 157, 75, 0.5);
 }
 
 .scratch-canvas {
